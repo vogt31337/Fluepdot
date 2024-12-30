@@ -1,4 +1,4 @@
-FROM fluepke/fluepdot-build-environment:latest
+FROM fluepke/fluepdot-build-environment:20241229
 COPY --chown=esp:esp ./ /fluepdot
 
 # build the esp32 firmware
@@ -7,6 +7,14 @@ WORKDIR /fluepdot/software/firmware/components/mcufont/mcufont
 RUN make -j -C encoder mcufont
 RUN make -j -C fonts
 WORKDIR /fluepdot/software/firmware
+
+RUN python3 /esp/esp-idf/tools/idf_tools.py install
+RUN python3 /esp/esp-idf/tools/idf_tools.py install-python-env
+RUN source /esp/esp-idf/export.sh
+
+RUN /esp/crosstool-NG/builds/xtensa-esp-elf/bin/xtensa-esp-elf-g++ /esp/crosstool-NG/builds/xtensa-esp-elf/bin/xtensa-esp32-elf-g++
+RUN /esp/crosstool-NG/builds/xtensa-esp-elf/bin/xtensa-esp-elf-gcc /esp/crosstool-NG/builds/xtensa-esp-elf/bin/xtensa-esp-elf-gcc
+
 RUN cmake . && make all -j
 
 # build the service utility
